@@ -1,13 +1,13 @@
 interface UploadRequestOptions {
   url: string;
   method: string;
-  data: any;
-  headers: {
+  data?: any;
+  headers?: {
     [propName: string]: string
   };
 }
 
-export default function ({url, method, data, headers}: UploadRequestOptions) {
+export default function ({url, method, data, headers = {}}: UploadRequestOptions) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     if (method.toLowerCase() === 'get' && data) {
