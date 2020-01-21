@@ -1,5 +1,5 @@
-import { Controller, Get, Post, UseBefore } from 'routing-controllers';
-import { UploadMiddleware } from '../middleware/UploadMiddleware';
+import { Controller, Get, Post, UseBefore, UseAfter } from 'routing-controllers';
+import { UploadMiddleware, MergeMiddleware } from '../middleware/index';
 
 @Controller()
 export class UploadController {
@@ -11,6 +11,16 @@ export class UploadController {
   @Post('/upload')
   @UseBefore(UploadMiddleware)
   uploadFile () {
-    return 'ok';
+    return {
+      msg: 'upload file success'
+    };
+  }
+
+  @Post('/merge')
+  @UseAfter(MergeMiddleware)
+  mergerHandler () {
+    return {
+      msg: 'merge success'
+    }
   }
 }

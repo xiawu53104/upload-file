@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import ajax from '../..//utils/ajax';
+import ajax from '../../utils/ajax';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -21,7 +21,7 @@ interface FileChunk {
 
 @Component
 export default class UploadFile extends Vue {
-  readonly LENGTH: number = 1;
+  readonly LENGTH: number = 3;
   selectedFile!: File;
   datas: FileChunk[] = [];
 
@@ -63,22 +63,34 @@ export default class UploadFile extends Vue {
         data: formData
       })
     })
-    await Promise.all(requestList);
+    let res = await Promise.all(requestList);
+    return res;
   };
 
   async uploadHandler () {
-    this.datas = this.selectedFile && this.createFileChunks(this.selectedFile);
-    console.log(this.datas);
-    let res = await this.uploadChunks();
-    // const formData = new FormData();
-    // formData.append('file', this.selectedFile)
-    // let res = await ajax({
-    //   url: `/api/upload`,
-    //   method: 'post',
-    //   data: formData
-    // })
-    console.log(res);
+    try {
+      this.datas = this.selectedFile && this.createFileChunks(this.selectedFile) || [];
+      let res = await this.uploadChunks();
+      await this.mergeReq();
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  async mergeReq () {
+    let data = JSON.stringify({
+      filename: this.selectedFile.name
+    });
+    let res = await ajax({
+      url: '/api/merge',
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      data: data
+    });
+    return res;
+  }
 }
 </script>
 

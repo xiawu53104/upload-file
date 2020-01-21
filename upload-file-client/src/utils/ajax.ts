@@ -25,9 +25,9 @@ export default function ({url, method, data, headers = {}}: UploadRequestOptions
     }
     xhr.onreadystatechange = function () {
       if (xhr.status === 200 && xhr.readyState === 4) {
-        resolve(xhr.responseText);
+        resolve(JSON.parse(xhr.responseText));
       } else {
-        reject(xhr.response)
+        // reject(xhr.response);
       }
     }
   });

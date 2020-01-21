@@ -5,25 +5,25 @@ import * as multiparty from 'multiparty';
 
 export class UploadMiddleware implements KoaMiddlewareInterface {
   readonly UPLOAD_DIR = path.resolve(__dirname, '../../static/upload');
-  multiparty = new multiparty.Form();
 
   use(context: any, next: (err?: any) => Promise<any>): Promise<any> {
-    this.multiparty.parse(context.req, async (err, fields, files) => {
+    let form = new multiparty.Form({
+      uploadDir: this.UPLOAD_DIR
+    });
+    form.parse(context.req, async (err, fields, files) => {
       if (err) {
         throw err;
       };
-      // console.log(JSON.stringify(fields));
-      // console.log(files);
       const [chunk] = files.chunk;
       const [hash] = fields.hash;
       const [filename] = fields.filename;
-      const chunkDir = `${this.UPLOAD_DIR}/${filename}`;
+      const [name, ext] = filename.split('.');
+      const chunkDir = `${this.UPLOAD_DIR}/${name}`;
 
       if (!fse.existsSync(chunkDir)) {
         await fse.mkdir(chunkDir);
       };
-
-      const destName = `${chunkDir}/${hash}`;
+      let destName = `${chunkDir}/${hash}`;
       if (fse.existsSync(destName)) {
         await fse.remove(destName);
       };
@@ -32,3 +32,4 @@ export class UploadMiddleware implements KoaMiddlewareInterface {
     return next();
   }
 }
+
